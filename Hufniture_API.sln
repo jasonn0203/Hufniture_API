@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 17
+VisualStudioVersion = 17.8.34330.188
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Hufniture_API", "Hufniture_API\Hufniture_API.csproj", "{430FF79A-0D48-4B9F-BA6B-E0FAF3737541}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{430FF79A-0D48-4B9F-BA6B-E0FAF3737541}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{430FF79A-0D48-4B9F-BA6B-E0FAF3737541}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{430FF79A-0D48-4B9F-BA6B-E0FAF3737541}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{430FF79A-0D48-4B9F-BA6B-E0FAF3737541}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9BC2A767-EA3E-460F-BF08-3A1E6689E999}
+	EndGlobalSection
+EndGlobal
