@@ -1,6 +1,7 @@
 ﻿using Hufniture_API.Data;
 using Hufniture_API.Services.TokenService;
 using Hufniture_API.ViewModel;
+using Hufniture_API.ViewModel.Auth;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 

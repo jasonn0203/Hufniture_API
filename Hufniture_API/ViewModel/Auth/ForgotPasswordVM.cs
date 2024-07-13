@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace Hufniture_API.ViewModel
+namespace Hufniture_API.ViewModel.Auth
 {
     public class ForgotPasswordVM
     {
