@@ -16,7 +16,7 @@ namespace Hufniture_API.Models
 
     public enum OrderStatusType
     {
-        Confirmed,
+        Confirmed ,
         InDelivery,
         Delivered
     }

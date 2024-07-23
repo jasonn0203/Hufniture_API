@@ -11,7 +11,7 @@ namespace Hufniture_API.Models
         public required string Name { get; set; }
 
 
-        public required ICollection<FurnitureProduct> FurnitureProducts { get; set; }
+        public required ICollection<FurniturePrProductVM> FurnitureProducts { get; set; }
 
 
     }

@@ -7,7 +7,7 @@ namespace Hufniture_API.Models
     {
         public Guid Id { get; set; } = Guid.NewGuid();
         public Guid FurnitureProductId { get; set; }
-        public FurnitureProduct FurnitureProduct { get; set; }
+        public FurniturePrProductVM FurnitureProduct { get; set; }
         public string UserId { get; set; }
         public AppUser User { get; set; }
 

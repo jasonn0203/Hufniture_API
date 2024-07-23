@@ -1,17 +1,40 @@
 ﻿using Hufniture_API.Data;
+using Hufniture_API.Repositories;
+using Hufniture_API.Repositories.ColorRepository;
+using Hufniture_API.Repositories.FurnitureCategoryRepository;
+using Hufniture_API.Repositories.FurnitureProductRepository;
+using Hufniture_API.Repositories.FurnitureTypeRepository;
+using Hufniture_API.Repositories.Interfaces;
+using Hufniture_API.Repositories.OrderItemRepository;
+using Hufniture_API.Repositories.OrderRepository;
+using Hufniture_API.Repositories.ReviewRepository;
+using Hufniture_API.Repositories.UserRepository;
+using Hufniture_API.Services.FurnitureCategoryService;
+using Hufniture_API.Services.FurnitureProductService;
+using Hufniture_API.Services.FurnitureTypeService;
+using Hufniture_API.Services.OrderService;
+using Hufniture_API.Services.ReviewService;
 using Hufniture_API.Services.TokenService;
+using Hufniture_API.UnitOfWork;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.IdentityModel.Tokens;
 using Microsoft.OpenApi.Models;
 using System.Text;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 
-builder.Services.AddControllers();
+builder.Services.AddControllers()
+    .AddJsonOptions(options =>
+    {
+        options.JsonSerializerOptions.ReferenceHandler = ReferenceHandler.IgnoreCycles;
+        options.JsonSerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+        options.JsonSerializerOptions.Converters.Add(new JsonStringEnumConverter());
+    });
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
 
@@ -107,9 +130,29 @@ builder.Services.AddCors(options =>
 
 
 
-
 //Config DI ( Repositories, Services )
 builder.Services.AddScoped<ITokenService, TokenService>();
+
+builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
+
+//DI Repository
+builder.Services.AddScoped(typeof(IGenericRepository<>), typeof(GenericRepository<>));
+builder.Services.AddScoped<IFurnitureCategoryRepository, FurnitureCategoryRepository>();
+builder.Services.AddScoped<IFurnitureTypeRepository, FurnitureTypeRepository>();
+builder.Services.AddScoped<IFurnitureProductRepository, FurnitureProductRepository>();
+builder.Services.AddScoped<IColorRepository, ColorRepository>();
+builder.Services.AddScoped<IReviewRepository, ReviewRepository>();
+builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+builder.Services.AddScoped<IOrderItemRepository, OrderItemRepository>();
+
+
+//DI Service
+builder.Services.AddTransient(typeof(IFurnitureCategoryService), typeof(FurnitureCategoryService));
+builder.Services.AddTransient(typeof(IFurnitureTypeService), typeof(FurnitureTypeService));
+builder.Services.AddTransient(typeof(IFurnitureProductService), typeof(FurnitureProductService));
+builder.Services.AddTransient(typeof(IReviewService), typeof(ReviewService));
+builder.Services.AddTransient(typeof(IOrderService), typeof(OrderService));
 
 
 
@@ -123,6 +166,7 @@ if (app.Environment.IsDevelopment())
 }
 
 app.UseHttpsRedirection();
+app.UseCors("CorsPolicy");
 
 // Authentication & Authorization
 app.UseAuthentication();

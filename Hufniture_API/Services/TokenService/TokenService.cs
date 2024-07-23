@@ -31,7 +31,7 @@ namespace Hufniture_API.Services.TokenService
             authClaims.AddRange(userRoles.Select(role => new Claim(ClaimTypes.Role, role)));
 
             var authSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(_configuration["JWT:SecretKey"]));
-            var tokenLifetime = TimeSpan.FromMinutes(1); // Set token expiration time
+            var tokenLifetime = TimeSpan.FromHours(3); // Set token expiration time
 
             var token = new JwtSecurityToken(
                 issuer: _configuration["JWT:ValidIssuer"],

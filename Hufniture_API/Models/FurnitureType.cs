@@ -9,6 +9,6 @@ namespace Hufniture_API.Models
         public required string Name { get; set; }
         public Guid FurnitureCategoryId { get; set; }
         public FurnitureCategory FurnitureCategory { get; set; }
-        public ICollection<FurnitureProduct> FurnitureProducts { get; set; }
+        public ICollection<FurniturePrProductVM> FurnitureProducts { get; set; }
     }
 }

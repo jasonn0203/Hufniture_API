@@ -2,8 +2,10 @@
 using Hufniture_API.Services.TokenService;
 using Hufniture_API.ViewModel;
 using Hufniture_API.ViewModel.Auth;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
+using System.Security.Claims;
 
 namespace Hufniture_API.Controllers
 {
@@ -82,17 +84,50 @@ namespace Hufniture_API.Controllers
 
             if (user == null || !await _userManager.CheckPasswordAsync(user, model.Password))
             {
-                return Unauthorized(new ApiResponse { Status = "Error", Message = "Invalid credentials!" });
+                return Unauthorized(new ApiResponse { Status = "Error", Message = "Password hoặc Email không đúng!" });
             }
 
             var token = await _tokenService.GenerateTokenAsync(user);
 
-            return Ok(new { Token = token, User = user.FullName });
+            var userResponse = new UserResponseVM
+            {
+                Email = user.Email,
+                Address = user.Address,
+                FullName = user.FullName,
+                BirthDate = user.BirthDate,
+                Gender = user.Gender,
+                Id = user.Id
+            };
+
+            return Ok(new { token = token, user = userResponse });
         }
 
 
         [HttpPost]
-        [Route("forgot-password")]
+        [Route("CheckEmail")]
+        public async Task<IActionResult> CheckEmail([FromBody] CheckEmailVM model)
+        {
+            if (!ModelState.IsValid)
+            {
+                var errors = ModelState.Values.SelectMany(v => v.Errors)
+                                              .Select(e => e.ErrorMessage)
+                                              .ToList();
+                return BadRequest(new ApiResponse { Status = "Error", Message = string.Join(", ", errors) });
+            }
+
+            var user = await _userManager.FindByEmailAsync(model.Email);
+            if (user == null)
+            {
+                return Ok(new ApiResponse { Status = "Error", Message = "Email không tồn tại." });
+            }
+
+            return Ok(new ApiResponse { Status = "Success", Message = "Email tồn tại." });
+        }
+
+
+
+        [HttpPost]
+        [Route("ForgotPassword")]
         public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordVM model)
         {
             if (!ModelState.IsValid)
@@ -125,9 +160,125 @@ namespace Hufniture_API.Controllers
             return Ok(new ApiResponse { Status = "Success", Message = "Đặt lại mật khẩu thành công!" });
         }
 
+        [Authorize]
+        [HttpPut]
+        [Route("UpdateUser/{userId}")]
+        public async Task<IActionResult> UpdateUser(string userId,[FromBody] UpdateUserInfoVM model)
+        {
+            // Lấy user hiện tại
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if (user == null)
+            {
+                return NotFound(new ApiResponse { Status = "Error", Message = "Không tìm thấy người dùng." });
+            }
+
+            // Cập nhật các thông tin có trong model
+            if (!string.IsNullOrEmpty(model.Address))
+            {
+                user.Address = model.Address;
+            }
+
+            if (!string.IsNullOrEmpty(model.FullName))
+            {
+                user.FullName = model.FullName;
+            }
+
+            if (model.BirthDate.HasValue)
+            {
+                user.BirthDate = model.BirthDate;
+            }
+
+            if (!string.IsNullOrEmpty(model.PhoneNumber))
+            {
+                user.PhoneNumber = model.PhoneNumber;
+            }
+
+            if (model.Gender.HasValue)
+            {
+                user.Gender = model.Gender;
+            }
+
+            // Cập nhật thông tin user trong database
+            var result = await _userManager.UpdateAsync(user);
+            if (!result.Succeeded)
+            {
+                var errors = string.Join(", ", result.Errors.Select(e => e.Description));
+                return StatusCode(StatusCodes.Status500InternalServerError, new ApiResponse { Status = "Error", Message = $"Cập nhật thông tin người dùng thất bại! Errors: {errors}" });
+            }
+
+            return Ok(new ApiResponse { Status = "Success", Message = "Cập nhật thông tin người dùng thành công!" });
+        }
 
 
-       
+        [Authorize]
+        [HttpGet]
+        [Route("GetUserInfo/{userId}")]
+        public async Task<IActionResult> GetUserInfo(string userId)
+        {
+            // Lấy user hiện tại
+            var user = await _userManager.FindByIdAsync(userId);
+
+            if (user == null)
+            {
+                return NotFound(new ApiResponse { Status = "Error", Message = "Không tìm thấy người dùng." });
+            }
+
+            var userResponse = new UserResponseVM
+            {
+                Id = user.Id,
+                Email = user.Email!,
+                Address = user.Address,
+                FullName = user.FullName,
+                BirthDate = user.BirthDate,
+                Gender = user.Gender,
+                PhoneNumber = user.PhoneNumber
+            };
+
+            return Ok(userResponse);
+        }
+
+
+        [Authorize]
+        [HttpPost]
+        [Route("ChangePassword/{userId}")]
+        public async Task<IActionResult> ChangePassword(string userId, [FromBody] ChangePasswordVM model)
+        {
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            // Tìm user dựa trên userId
+            var user = await _userManager.FindByIdAsync(userId);
+            if (user == null)
+            {
+                return NotFound("Không tìm thấy user này");
+            }
+
+            // Kiểm tra mật khẩu hiện tại
+            var passwordCheck = await _userManager.CheckPasswordAsync(user, model.CurrentPassword);
+            if (!passwordCheck)
+            {
+                return BadRequest("Mật khẩu hiện tại không chính xác !");
+            }
+
+            // Kiểm tra mật khẩu mới và xác nhận mật khẩu mới
+            if (model.NewPassword != model.ConfirmNewPassword)
+            {
+                return BadRequest("Mật khẩu mới không trùng với nhập lại mật khẩu mới");
+            }
+
+            // Thay đổi mật khẩu
+            var result = await _userManager.ChangePasswordAsync(user, model.CurrentPassword, model.NewPassword);
+            if (!result.Succeeded)
+            {
+                return BadRequest(result.Errors);
+            }
+
+            return Ok("Đổi mật khẩu thành công !");
+        }
+
 
     }
 }

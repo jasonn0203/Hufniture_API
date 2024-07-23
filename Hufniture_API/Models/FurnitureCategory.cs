@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations;
+﻿using Newtonsoft.Json;
+using System.ComponentModel.DataAnnotations;
 
 namespace Hufniture_API.Models
 {
@@ -9,7 +10,9 @@ namespace Hufniture_API.Models
         [MaxLength(100)]
         public required string Name { get; set; }
         public required string CategoryIcon { get; set; }
-        public ICollection<FurnitureProduct> FurnitureProducts { get; set; }
+        [JsonIgnore]
+        public ICollection<FurniturePrProductVM> FurnitureProducts { get; set; }
+        [JsonIgnore]
         public ICollection<FurnitureType> FurnitureTypes { get; set; }
     }
 }

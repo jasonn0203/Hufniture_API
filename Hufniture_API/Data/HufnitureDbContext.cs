@@ -11,7 +11,7 @@ namespace Hufniture_API.Data
         }
 
         // Models
-        public DbSet<FurnitureProduct> FurnitureProducts { get; set; }
+        public DbSet<FurniturePrProductVM> FurnitureProducts { get; set; }
         public DbSet<FurnitureCategory> FurnitureCategories { get; set; }
         public DbSet<FurnitureType> FurnitureTypes { get; set; }
         public DbSet<Order> Orders { get; set; }
@@ -28,13 +28,13 @@ namespace Hufniture_API.Data
 
             //Config relationships of the database ( 1-1, Many-Many, 1-Many )
 
-            builder.Entity<FurnitureProduct>()
+            builder.Entity<FurniturePrProductVM>()
                .HasOne(p => p.FurnitureCategory)
                .WithMany(c => c.FurnitureProducts)
                .HasForeignKey(p => p.FurnitureCategoryId)
                .OnDelete(DeleteBehavior.Restrict);
 
-            builder.Entity<FurnitureProduct>()
+            builder.Entity<FurniturePrProductVM>()
                 .HasOne(p => p.FurnitureType)
                 .WithMany(t => t.FurnitureProducts)
                 .HasForeignKey(p => p.FurnitureTypeId)
@@ -46,13 +46,13 @@ namespace Hufniture_API.Data
                 .HasForeignKey(t => t.FurnitureCategoryId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            builder.Entity<FurnitureProduct>()
+            builder.Entity<FurniturePrProductVM>()
                 .HasOne(p => p.Color)
                 .WithMany(c => c.FurnitureProducts)
                 .HasForeignKey(p => p.ColorId)
                 .OnDelete(DeleteBehavior.Restrict);
 
-            builder.Entity<FurnitureProduct>()
+            builder.Entity<FurniturePrProductVM>()
                 .Property(p => p.Price)
                 .HasColumnType("decimal(18,2)")
                 .IsRequired();
